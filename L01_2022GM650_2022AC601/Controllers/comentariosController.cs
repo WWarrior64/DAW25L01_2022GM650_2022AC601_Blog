@@ -7,11 +7,11 @@ namespace L01_2022GM650_2022AC601.Controllers
 {
 	[Route("api/[controller]")]
 	[ApiController]
-	public class usuariosController : ControllerBase
+	public class comentariosController : ControllerBase
 	{
 		private readonly blogDBContext _blogDBContexto;
 
-		public usuariosController(blogDBContext blogDBContexto)
+		public comentariosController(blogDBContext blogDBContexto)
 		{
 			_blogDBContexto = blogDBContexto;
 		}
@@ -20,57 +20,30 @@ namespace L01_2022GM650_2022AC601.Controllers
 		/// EndPoint que retorna el listado de todos los equipos existentes
 		/// </summary>
 		[HttpGet]
-		[Route("GetAllusuarios")]
-		public IActionResult GetUsuarios()
+		[Route("GetAllcomentarios")]
+		public IActionResult GetComentarios()
 		{
-			var listadoUsuarios = (from e in _blogDBContexto.usuarios join t in _blogDBContexto.roles on e.rolId equals t.rolId
-											  select new
-											  {
-												  e.usuarioId,
-												  e.rolId,
-												  Rol = t.rol,
-												  e.nombreUsuario,
-												  e.clave,
-												  e.nombre,
-												  e.apellido,
-											  }).ToList();
+			var listadoComentarios = (from e in _blogDBContexto.comentarios
+								   join t in _blogDBContexto.publicaciones on e.publicacionId equals t.publicacionId
+								   join q in _blogDBContexto.usuarios on e.usuarioId equals q.usuarioId
+								   select new
+								   {
+									   e.comentarioId,
+									   e.publicacionId,
+									   Titulo_publicación = t.titulo,
+									   e.comentario,
+									   e.usuarioId,
+									   nombre_usuario = q.nombreUsuario
+
+								   }).ToList();
 
 
-			if (listadoUsuarios.Count == 0)
+			if (listadoComentarios.Count == 0)
 			{
 				return NotFound();
 			}
 
-			return Ok(listadoUsuarios);
-		}
-
-		/// <summary> 
-		/// EndPoint que retorna los registros de una tabla filtrados por su nombre y apellido
-		/// </summary> 
-		[HttpGet]
-		[Route("FilterByNombreApellido/{nombre}/{apellido}")]
-		public IActionResult FilterUsuarioPorNombreApellido(string nombre, string apellido)
-		{
-			var usuarioLista = (from e in _blogDBContexto.usuarios
-								 join t in _blogDBContexto.roles on e.rolId equals t.rolId
-								 where e.nombre.Contains(nombre) && e.apellido.Contains(apellido)
-								 select new
-								 {
-									 e.usuarioId,
-									 e.rolId,
-									 Rol = t.rol,
-									 e.nombreUsuario,
-									 e.clave,
-									 e.nombre,
-									 e.apellido,
-								 }).ToList();
-
-			if (usuarioLista.Count == 0)
-			{
-				return NotFound();
-			}
-
-			return Ok(usuarioLista);
+			return Ok(listadoComentarios);
 		}
 
 		/// <summary> 
@@ -78,41 +51,41 @@ namespace L01_2022GM650_2022AC601.Controllers
 		/// </summary> 
 		/// <returns></returns> 
 		[HttpGet]
-		[Route("FilterByRol/{rolId}")]
+		[Route("FilterByPublicacion/{publicacionId}")]
 
-		public IActionResult FilterUsuarioPorRol(int id)
+		public IActionResult FilterComentarioPorPublicacion(int id)
 		{
-			var usuarioLista = (from e in _blogDBContexto.usuarios
-									  join t in _blogDBContexto.roles on e.rolId equals t.rolId
-									  where e.rolId == id
-									  select new
-									  {
-										  e.usuarioId,
-										  e.rolId,
-										  Rol = t.rol,
-										  e.nombreUsuario,
-										  e.clave,
-										  e.nombre,
-										  e.apellido,
-									  }).ToList();
+			var comentarioLista = (from e in _blogDBContexto.comentarios
+								join t in _blogDBContexto.publicaciones on e.publicacionId equals t.publicacionId
+								join q in _blogDBContexto.usuarios on e.usuarioId equals q.usuarioId
+								where e.publicacionId == id
+								select new
+								{
+									e.comentarioId,
+									e.publicacionId,
+									Titulo_publicación = t.titulo,
+									e.comentario,
+									e.usuarioId,
+									nombre_usuario = q.nombreUsuario
+								}).ToList();
 
-			if (usuarioLista.Count == 0)
+			if (comentarioLista.Count == 0)
 			{
 				return NotFound();
 			}
 
-			return Ok(usuarioLista);
+			return Ok(comentarioLista);
 		}
 
 		[HttpPost]
 		[Route("Add")]
-		public ActionResult GuardarUsuario([FromBody] usuarios usuario)
+		public ActionResult GuardarComentario([FromBody] comentarios comentario)
 		{
 			try
 			{
-				_blogDBContexto.usuarios.Add(usuario);
+				_blogDBContexto.comentarios.Add(comentario);
 				_blogDBContexto.SaveChanges();
-				return Ok(usuario);
+				return Ok(comentario);
 			}
 			catch (Exception ex)
 			{

@@ -21,7 +21,17 @@ namespace L01_2022GM650_2022AC601.Controllers
         [Route("GetAllPublicaciones")]
         public IActionResult GetPublicaciones()
         {
-            var listadoPublicaciones = (from e in _blogDBContexto.publicaciones select e).ToList();
+            var listadoPublicaciones = (from e in _blogDBContexto.publicaciones
+										join u in _blogDBContexto.usuarios on
+                                        e.usuarioId equals u.usuarioId
+										select new
+										{
+											e.publicacionId,
+											e.titulo,
+											e.descripcion,
+											e.usuarioId,
+											nombre_usuario = u.nombre
+										}).ToList();
 
             if (listadoPublicaciones.Count == 0)
             {
@@ -32,8 +42,98 @@ namespace L01_2022GM650_2022AC601.Controllers
         }
 
 
-        /*Guardar un nuevo registro*/
-        [HttpPost]
+		/*Retorno por usuario en especifico*/
+		/*Se incluyo tanto por Id como por Nombre*/
+		/// <param name="usuarioId"></param> 
+		[HttpGet]
+		[Route("GetByUsuario/{usuarioId}")]
+		public IActionResult GetporUsuario(int usuarioId)
+		{
+			var publicacionesUsuario = (from p in _blogDBContexto.publicaciones
+										join u in _blogDBContexto.usuarios on
+										p.usuarioId equals u.usuarioId
+										where p.usuarioId == usuarioId
+										select new
+										{
+											p.publicacionId,
+											p.titulo,
+											p.descripcion,
+											p.usuarioId,
+											nombre_usuario = u.nombre
+										}).ToList();
+
+
+			if (publicacionesUsuario.Count == 0)
+			{
+				return NotFound();
+			}
+
+			return Ok(publicacionesUsuario);
+		}
+
+
+		/// <param name="nombreUsuario"></param> 
+		[HttpGet]
+		[Route("GetByNombreUsuario/{nombreUsuario}")]
+		public IActionResult GetporNombre(string nombreUsuario)
+		{
+
+
+			var publicacionesUsuario = (from p in _blogDBContexto.publicaciones
+										join u in _blogDBContexto.usuarios on
+										p.usuarioId equals u.usuarioId
+										where u.nombre.Contains(nombreUsuario)
+										select new
+										{
+											p.publicacionId,
+											p.titulo,
+											p.descripcion,
+											p.usuarioId,
+											nombre_usuario = u.nombre
+										}).ToList();
+
+
+			if (publicacionesUsuario.Count == 0)
+			{
+				return NotFound();
+			}
+
+			return Ok(publicacionesUsuario);
+		}
+
+		/*Obtener publicaciones*/
+		/// EndPoint que tiene el top N de comentarios junto con su cantidad de comentarios
+		[HttpGet]
+		[Route("GetTopNComentarios/{topN}")]
+		public IActionResult GetTopNComentarios(int topN)
+		{
+			var listadoPublicaciones = (from e in _blogDBContexto.publicaciones
+										join u in _blogDBContexto.usuarios on
+										e.usuarioId equals u.usuarioId
+										join c in _blogDBContexto.comentarios on 
+										e.publicacionId equals c.publicacionId into comentarios
+										select new
+										{
+											e.publicacionId,
+											e.titulo,
+											e.descripcion,
+											e.usuarioId,
+											nombre_usuario = u.nombre,
+											cantidad_comentarios = comentarios.Count()
+										}).OrderByDescending(x => x.cantidad_comentarios)
+										.Take(topN).ToList();
+
+			if (listadoPublicaciones.Count == 0)
+			{
+				return NotFound();
+			}
+
+			return Ok(listadoPublicaciones);
+		}
+
+
+		/*Guardar un nuevo registro*/
+		[HttpPost]
         [Route("AddPublicacion")]
         public IActionResult GuardarPublicacion([FromBody] publicaciones publicaciones)
         {
@@ -101,69 +201,6 @@ namespace L01_2022GM650_2022AC601.Controllers
             return Ok(publicaciones);
 
         }
-
-        /*Retorno por usuario en especifico*/
-        /*Se incluyo tanto por Id como por Nombre*/
-        /// <param name="usuarioId"></param> 
-        [HttpGet]
-        [Route("GetByUsuario/{usuarioId}")]
-        public IActionResult GetporUsuario(int usuarioId)
-        {
-            var publicacionesUsuario = (from p in _blogDBContexto.publicaciones
-                                        where p.usuarioId == usuarioId
-                                        select new
-                                        {
-                                            p.publicacionId,
-                                            p.titulo,
-                                            p.descripcion,
-                                            p.usuarioId
-                                        }).ToList();
-
-
-            if (publicacionesUsuario == null || publicacionesUsuario.Count == 0)
-            {
-                return NotFound();
-            }
-
-            return Ok(publicacionesUsuario);
-        }
-
-
-        /// <param name="nombreUsuario"></param> 
-        [HttpGet]
-        [Route("GetByNombreUsuario/{nombreUsuario}")]
-        public IActionResult GetporNombre(string nombreUsuario)
-        {
-
-            var usuario = _blogDBContexto.usuarios
-                .FirstOrDefault(u => u.nombreUsuario == nombreUsuario);
-
-
-            if (usuario == null)
-            {
-                return NotFound();
-            }
-
-
-            var publicacionesUsuario = (from p in _blogDBContexto.publicaciones
-                                        where p.usuarioId == usuario.usuarioId
-                                        select new
-                                        {
-                                            p.publicacionId,
-                                            p.titulo,
-                                            p.descripcion,
-                                            p.usuarioId
-                                        }).ToList();
-
-
-            if (publicacionesUsuario == null || publicacionesUsuario.Count == 0)
-            {
-                return NotFound();
-            }
-
-            return Ok(publicacionesUsuario);
-        }
-
 
     }
 }
