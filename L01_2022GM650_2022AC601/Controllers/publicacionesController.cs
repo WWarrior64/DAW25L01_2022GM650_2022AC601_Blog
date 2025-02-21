@@ -30,7 +30,9 @@ namespace L01_2022GM650_2022AC601.Controllers
 											e.titulo,
 											e.descripcion,
 											e.usuarioId,
-											nombre_usuario = u.nombre
+											nombre_Usuario = u.nombreUsuario,
+											nombre = u.nombre,
+											apellido = u.apellido
 										}).ToList();
 
             if (listadoPublicaciones.Count == 0)
@@ -59,7 +61,9 @@ namespace L01_2022GM650_2022AC601.Controllers
 											p.titulo,
 											p.descripcion,
 											p.usuarioId,
-											nombre_usuario = u.nombre
+											nombre_Usuario = u.nombreUsuario,
+											nombre = u.nombre,
+											apellido = u.apellido
 										}).ToList();
 
 
@@ -74,22 +78,24 @@ namespace L01_2022GM650_2022AC601.Controllers
 
 		/// <param name="nombreUsuario"></param> 
 		[HttpGet]
-		[Route("GetByNombreUsuario/{nombreUsuario}")]
-		public IActionResult GetporNombre(string nombreUsuario)
+		[Route("GetByNombreDelUsuario/{nombre}")]
+		public IActionResult GetporNombre(string nombre)
 		{
 
 
 			var publicacionesUsuario = (from p in _blogDBContexto.publicaciones
 										join u in _blogDBContexto.usuarios on
 										p.usuarioId equals u.usuarioId
-										where u.nombre.Contains(nombreUsuario)
+										where u.nombre.Contains(nombre)
 										select new
 										{
 											p.publicacionId,
 											p.titulo,
 											p.descripcion,
 											p.usuarioId,
-											nombre_usuario = u.nombre
+											nombre_Usuario = u.nombreUsuario,
+											nombre = u.nombre,
+											apellido = u.apellido
 										}).ToList();
 
 
@@ -117,8 +123,9 @@ namespace L01_2022GM650_2022AC601.Controllers
 											e.publicacionId,
 											e.titulo,
 											e.descripcion,
-											e.usuarioId,
-											nombre_usuario = u.nombre,
+											nombre_Usuario = u.nombreUsuario,
+											nombre = u.nombre,
+											apellido = u.apellido,
 											cantidad_comentarios = comentarios.Count()
 										}).OrderByDescending(x => x.cantidad_comentarios)
 										.Take(topN).ToList();

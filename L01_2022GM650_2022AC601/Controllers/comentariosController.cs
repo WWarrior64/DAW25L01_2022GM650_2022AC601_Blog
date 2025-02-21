@@ -33,7 +33,9 @@ namespace L01_2022GM650_2022AC601.Controllers
 									   Titulo_publicación = t.titulo,
 									   e.comentario,
 									   e.usuarioId,
-									   nombre_usuario = q.nombreUsuario
+									   nombre_usuario = q.nombreUsuario,
+									   nombre = q.nombre,
+									   apellido = q.apellido
 
 								   }).ToList();
 
@@ -51,7 +53,7 @@ namespace L01_2022GM650_2022AC601.Controllers
 		/// </summary> 
 		/// <returns></returns> 
 		[HttpGet]
-		[Route("FilterByPublicacion/{publicacionId}")]
+		[Route("FilterByPublicacion/{id}")]
 
 		public IActionResult FilterComentarioPorPublicacion(int id)
 		{
@@ -66,7 +68,9 @@ namespace L01_2022GM650_2022AC601.Controllers
 									Titulo_publicación = t.titulo,
 									e.comentario,
 									e.usuarioId,
-									nombre_usuario = q.nombreUsuario
+									nombre_usuario = q.nombreUsuario,
+									nombre = q.nombre,
+									apellido = q.apellido
 								}).ToList();
 
 			if (comentarioLista.Count == 0)

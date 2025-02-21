@@ -78,7 +78,7 @@ namespace L01_2022GM650_2022AC601.Controllers
 		/// </summary> 
 		/// <returns></returns> 
 		[HttpGet]
-		[Route("FilterByRol/{rolId}")]
+		[Route("FilterByRol/{id}")]
 
 		public IActionResult FilterUsuarioPorRol(int id)
 		{
