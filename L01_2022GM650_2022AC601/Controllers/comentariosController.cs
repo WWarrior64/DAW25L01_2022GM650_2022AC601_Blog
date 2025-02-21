@@ -95,48 +95,42 @@ namespace L01_2022GM650_2022AC601.Controllers
 
 		[HttpPut]
 		[Route("actualizar/{id}")]
-		public IActionResult ActualizarUsuario(int id, [FromBody] usuarios usuarioModificar)
+		public IActionResult ActualizarComentarios(int id, [FromBody] comentarios comentarioModificar)
 		{
-			//Para actualizar un registro, se obtiene el registro original de la base de datos 
-			//al cual alteraremos alguna propiedad 
-			usuarios? usuarioActual = (from e in _blogDBContexto.usuarios where e.usuarioId == id select e).FirstOrDefault();
+			
+			comentarios? comentarioActual = (from e in _blogDBContexto.comentarios where e.comentarioId == id select e).FirstOrDefault();
 
-			//Verificamos que exista el registro segun su ID 
-			if (usuarioActual == null)
+			
+			if (comentarioActual == null)
 			{
 				return NotFound();
 			}
 
-			//Si se encuentra el registro, se alteran los campos modificables 
-			usuarioActual.rolId = usuarioModificar.rolId;
-			usuarioActual.nombreUsuario = usuarioModificar.nombreUsuario;
-			usuarioActual.clave = usuarioModificar.clave;
-			usuarioActual.nombre = usuarioModificar.nombre;
-			usuarioActual.apellido = usuarioModificar.apellido;
-			//Se marca el registro como modificado en el contexto 
-			//y se envia la modificacion a la base de datos 
-			_blogDBContexto.Entry(usuarioActual).State = EntityState.Modified;
+		
+			comentarioActual.publicacionId = comentarioModificar.publicacionId;
+            comentarioActual.comentario = comentarioModificar.comentario;
+            comentarioActual.usuarioId = comentarioModificar.usuarioId;
+
+         
+            _blogDBContexto.Entry(comentarioActual).State = EntityState.Modified;
 			_blogDBContexto.SaveChanges();
-			return Ok(usuarioModificar);
+			return Ok(comentarioModificar);
 		}
 
 		[HttpDelete]
 		[Route("eliminar/{id}")]
-		public IActionResult EliminarUsuario(int id)
+		public IActionResult EliminarComentario(int id)
 		{
-			//Para actualizar un registro, se obtiene el registro original de la base de datos 
-			//al cual eliminaremos 
-			usuarios? usuario = (from e in _blogDBContexto.usuarios where e.usuarioId == id select e).FirstOrDefault();
+			
+			comentarios? comentario = (from e in _blogDBContexto.comentarios where e.comentarioId == id select e).FirstOrDefault();
 
-			//Verificamos que exista el registro segun su ID 
-			if (usuario == null)
+			if (comentario == null)
 				return NotFound();
-
-			//Ejecutamos la accion de elminar el registro 
-			_blogDBContexto.usuarios.Attach(usuario);
-			_blogDBContexto.usuarios.Remove(usuario);
+ 
+			_blogDBContexto.comentarios.Attach(comentario);
+			_blogDBContexto.comentarios.Remove(comentario);
 			_blogDBContexto.SaveChanges();
-			return Ok(usuario);
+			return Ok(comentario);
 		}
 	}
 }
