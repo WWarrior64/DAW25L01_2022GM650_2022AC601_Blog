@@ -17,7 +17,7 @@ namespace L01_2022GM650_2022AC601.Controllers
 		}
 
 		/// <summary>
-		/// EndPoint que retorna el listado de todos los equipos existentes
+		/// EndPoint que retorna el listado de todos los registros existentes
 		/// </summary>
 		[HttpGet]
 		[Route("GetAllcomentarios")]
@@ -49,7 +49,7 @@ namespace L01_2022GM650_2022AC601.Controllers
 		}
 
 		/// <summary> 
-		/// EndPoint que retorna los registros de una tabla filtrados por descripcion 
+		/// EndPoint que retorna los registros de una tabla filtrados por publicacion
 		/// </summary> 
 		/// <returns></returns> 
 		[HttpGet]
